@@ -1,51 +1,51 @@
 import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, StatusBar, StyleSheet, View, ScrollView, Alert, ActivityIndicator } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { useAuth } from '../contexto/AuthContext'; // Usamos nuestro contexto
+import { Text, TextInput, TouchableOpacity, StatusBar, StyleSheet, View, ScrollView, Alert, ActivityIndicator, Image } from 'react-native';
+import { useAuth } from '../contexto/AuthContext';
 
 export default function LoginScreen({ navigation }) {
     const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
     const [cargando, setCargando] = useState(false);
-    
-    // Traemos la función login de nuestro contexto
     const { login } = useAuth();
 
     const handleLogin = async () => {
-      if (!correo || !password) {
-        Alert.alert('Error', 'Por favor ingresa correo y contraseña');
-        return;
-      }
+        if (!correo || !password) {
+            Alert.alert('Error', 'Por favor ingresa correo y contraseña');
+            return;
+        }
 
-      setCargando(true);
-      // El tercer parámetro 'true' es para "recordar sesión"
-      const result = await login(correo, password, true); 
-      setCargando(false);
+        setCargando(true);
+        const result = await login(correo, password, true); 
+        setCargando(false);
 
-      if (!result.success) {
-        Alert.alert('Error', result.error || 'Credenciales incorrectas.');
-      }
+        if (!result.success) {
+            Alert.alert('Error', result.error || 'Credenciales incorrectas.');
+        }
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-             <StatusBar barStyle="light-content" backgroundColor="#1976D2" />
-        
-            <View style={styles.headerSection}>
-                <View style={styles.logoCircle}>
-                    <AntDesign name="book" size={40} color="#1976D2" /> 
-                </View>
+        <ScrollView contentContainerStyle={styles.container} bounces={false}>
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+            
+            {/* Sección del Logo Superior */}
+            <View style={styles.logoSection}>
+                {/* Imagen real del logo desde assets */}
+                <Image 
+                    source={require('../assets/apuntes_logo.png')} 
+                    style={styles.logoImage}
+                    resizeMode="contain" // Asegura que la imagen no se corte ni estire feo
+                />
                 <Text style={styles.appName}>apuntes</Text>
-                <Text style={styles.subTitleApp}>Gestión de Tareas</Text>
+                <Text style={styles.subTitleApp}>Gestión de tareas</Text>
             </View>
             
-            <View style={styles.recuadro}>
-                <Text style={styles.title}>Inicia Sesión</Text>
+            {/* Sección del Formulario (Recuadro azul claro) */}
+            <View style={styles.formContainer}>
+                <Text style={styles.formTitle}>Inicia sesión</Text>
                 
                 <Text style={styles.inputLabel}>Correo electrónico</Text>
                 <TextInput 
                     style={styles.input}
-                    placeholder='ejemplo@correo.com'
                     keyboardType='email-address'
                     autoCapitalize="none"
                     value={correo}
@@ -55,7 +55,6 @@ export default function LoginScreen({ navigation }) {
                 <Text style={styles.inputLabel}>Contraseña</Text>
                 <TextInput 
                     style={styles.input}
-                    placeholder="********" 
                     secureTextEntry={true} 
                     value={password}
                     onChangeText={setPassword} 
@@ -73,10 +72,16 @@ export default function LoginScreen({ navigation }) {
                     )}
                 </TouchableOpacity>
 
-                <View style={styles.registerContainer}>
-                    <Text style={styles.registerText}>¿No tienes cuenta? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Registro')}>
-                        <Text style={styles.registerLink}>Crea una cuenta.</Text>
+                <View style={styles.linksContainer}>
+                    <View style={styles.rowLink}>
+                        <Text style={styles.textNormal}>¿No tienes cuenta? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Registro')}>
+                            <Text style={styles.textLink}>Crea una cuenta.</Text>
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <TouchableOpacity style={{ marginTop: 15 }}>
+                        <Text style={styles.textLink}>¿Olvidaste tu contraseña? Recuperar contraseña.</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -85,18 +90,95 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flexGrow: 1, alignItems: 'center', backgroundColor: '#1976D2', paddingTop: 50 },
-    headerSection: { justifyContent: 'center', alignItems: 'center', height: '40%', paddingTop: 20 },
-    logoCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-    appName: { fontSize: 32, fontWeight: 'bold', color: 'white', marginBottom: 5 },
-    subTitleApp: { fontSize: 16, color: 'white', opacity: 0.8, marginBottom: 30 },
-    recuadro: { flex: 1, backgroundColor: 'white', borderTopLeftRadius: 40, borderTopRightRadius: 40, padding: 30, width: '100%', elevation: 10 },
-    title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 30, color: "#333" },
-    inputLabel: { fontSize: 14, color: '#333', marginBottom: 5, fontWeight: '500' },
-    input: { height: 50, borderColor: '#eee', borderWidth: 1, borderRadius: 8, paddingHorizontal: 15, marginBottom: 20, backgroundColor: '#fafafa', fontSize: 16 },
-    loginButton: { backgroundColor: '#1976D2', paddingVertical: 15, borderRadius: 8, alignItems: 'center', marginTop: 10, marginBottom: 20 },
-    loginButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-    registerContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 10 },
-    registerText: { color: '#666', fontSize: 14 },
-    registerLink: { color: '#1976D2', fontWeight: 'bold', fontSize: 14 },
+    container: { 
+        flexGrow: 1, 
+        backgroundColor: '#FFFFFF', 
+        alignItems: 'center',
+        paddingTop: 60 
+    },
+    logoSection: { 
+        alignItems: 'center', 
+        marginBottom: 30 
+    },
+    logoImage: {
+        width: 120, // Ajusta el tamaño según tu logo real
+        height: 120,
+        marginBottom: 10
+    },
+    appName: { 
+        fontSize: 28, 
+        fontWeight: 'bold', 
+        color: '#4FC3F7', 
+        marginBottom: 5 
+    },
+    subTitleApp: { 
+        fontSize: 16, 
+        color: '#666', 
+    },
+    formContainer: { 
+        backgroundColor: '#F0F8FF', 
+        width: '85%',
+        borderRadius: 20, 
+        padding: 25, 
+        alignItems: 'center',
+        elevation: 2, // Sombra suave en Android
+        shadowColor: '#000', // Sombra suave en iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    formTitle: { 
+        fontSize: 20, 
+        color: '#333', 
+        marginBottom: 20 
+    },
+    inputLabel: { 
+        alignSelf: 'flex-start',
+        fontSize: 12, 
+        color: '#333', 
+        marginBottom: 5, 
+        marginLeft: 5 
+    },
+    input: { 
+        width: '100%',
+        height: 45, 
+        backgroundColor: '#FFFFFF', 
+        borderColor: '#E0E0E0', 
+        borderWidth: 1, 
+        borderRadius: 25, 
+        paddingHorizontal: 15, 
+        marginBottom: 15, 
+        fontSize: 14 
+    },
+    loginButton: { 
+        backgroundColor: '#90CAF9', 
+        width: '100%',
+        height: 45, 
+        borderRadius: 25, 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        marginTop: 10, 
+        marginBottom: 20 
+    },
+    loginButtonText: { 
+        color: 'white', 
+        fontSize: 16, 
+        fontWeight: '600' 
+    },
+    linksContainer: { 
+        alignItems: 'center', 
+        width: '100%' 
+    },
+    rowLink: { 
+        flexDirection: 'row' 
+    },
+    textNormal: { 
+        color: '#666', 
+        fontSize: 12 
+    },
+    textLink: { 
+        color: '#1976D2', 
+        fontSize: 12, 
+        fontWeight: 'bold' 
+    }
 });
