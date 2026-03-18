@@ -1,0 +1,54 @@
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import UserController from '../controllers/UserController';
+
+// Creamos el contexto
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Al abrir la app, revisamos si el usuario ya había iniciado sesión antes
+    useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const sessionUser = await UserController.getActiveSession();
+            if (sessionUser) {
+              setUser(sessionUser);
+            }
+          } catch (error) {
+            console.error("Error verificando sesión:", error);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        checkSession();
+    }, []);
+
+  // Función para iniciar sesión
+    const login = async (correo, password, recordar) => {
+        const result = await UserController.login(correo, password, recordar);
+        if (result.success) {
+            setUser(result.user); 
+        }
+        return result;
+    };
+
+    // Función para registrar
+    const register = async (nombre, correo, password) => {
+        return await UserController.register(nombre, correo, password);
+    };
+
+    // Función para cerrar sesión
+    const logout = async () => {
+        await UserController.logout();
+        setUser(null); 
+    };
+
+    return (
+        <AuthContext.Provider value={{ user, isLoading, login, logout, register }}>
+        {children}
+        </AuthContext.Provider>
+    );
+};
+export const useAuth = () => useContext(AuthContext);
